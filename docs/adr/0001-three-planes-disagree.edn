@@ -1,0 +1,123 @@
+[{:db/id -1
+  :adr/id "adr-0001-intel-actor-three-planes-disagree"
+  :adr/title "ADR-0001: intel-actor の 3 面は一致していない — 記録し、勝手に一致させない"
+  :adr/status "accepted"
+  :adr/doc_type "adr"
+  :adr/date "2026-09-03"
+  :adr/deciders ["Jun Kawasaki (+ Claude)"]
+  :adr/topic "intel-actor-three-planes-disagree"
+  :adr/related ["adr-2608052000-itonami-maturity-axes"
+                "adr-2608080000-itonami-maturity-improve-loop"]
+  :adr/supersedes []
+  :adr/superseded_by []
+  :adr/repos ["cloud-itonami/intel-actor"]
+  :adr/authoritative true
+  :adr/authoritative_for ["intel-actor の README が 3 面の不一致をどう扱うか（記録するが reconcile しない）"]
+  :adr/last_verified "2026-09-03"
+  :adr/body "# ADR-0001: intel-actor の 3 面は一致していない — 記録し、勝手に一致させない
+
+**Status**: accepted
+**Date**: 2026-09-03
+**Measured at**: commit 4d2851e
+
+## Context
+
+intel-actor は小さな repo（測定時点の 4d2851e で 10 ファイル、この ADR と README を加えて 13）だが、この actor が何であるかを述べる面が 4 つある:
+
+1. `src/intel/murakumo.cljc` — 実際に plan を作る境界
+2. `actor-manifest.jsonld` — actor の宣言（capability / trigger / runtime）
+3. `.well-known/did.json` — DID document
+4. `CLAUDE.md` — 配備されたプラットフォームの散文
+
+**この 4 面は互いに一致していない。** 2026-09-03 に実測した 3 点:
+
+### (1) actor DID が 2 つある
+
+`murakumo.cljc` の `actor-did` と manifest の `@id` はどちらも
+`did:web:intel.etzhayyim.com`。しかし `.well-known/did.json` の `id` は
+`did:web:etzhayyim.com:actor:intel` で、**別の DID である**。
+`put-record-effect` が全 effect に打つ `:actor` は前者なので、did.json を
+解決した相手が受け取る identity とは一致しない。
+
+### (2) runtime の記述が食い違う
+
+manifest は `runtime: k8s-langserver` / `edge: sveltekit-proxy`。
+CLAUDE.md の表は `Runtime | Worker WASM (default)`。どちらもこの repo には
+存在しない（ここには runtime が 1 バイトも無い）ので、両方とも
+『他のどこかの配備』を指しているが、指し先が同じかどうかはここからは分からない。
+
+### (3) collection 名の集合が 1 つも重ならない
+
+これが一番効く。`collection` は `(str \"com.etzhayyim.intel.\" name)` で
+cell key から名前を導出するので、15 cell から 15 個の
+`com.etzhayyim.intel.<lowercase>` が出る。一方 manifest が
+`triggers.subscribeRepos.collections` と `requiredCollections` で宣言するのは
+10 個の `com.etzhayyim.apps.<app>.<camelCase>`。
+
+**共通部分は 0 件。**
+
+正しい名前はデータの中に在る —— `:legacy-cell` が
+`com-etzhayyim-apps-intel-submitAnalysis` のように camelCase と `apps` 名前空間を
+保存している。`collection` はそれを読まず、cell key から別の名前を作り直している。
+
+したがって `:ready` になった plan は、**どの宣言済み trigger も購読していない
+collection 宛の `:mst/put-record` effect を返す**。effect は生成されるので
+拒否には見えず、静かに別の場所を指す。
+
+## Decision
+
+**記録する。reconcile しない。**
+
+- README にこの 3 点を測定値として書き、再測定コマンドを添える。
+- `collection` の実装も、did.json も、manifest も、CLAUDE.md も**変更しない**。
+
+## Rationale
+
+どの面を正本にするかは、この repo の中からは決められない:
+
+- `collection` を `:legacy-cell` から導出し直すと、**書き込み先が変わる**。
+  これは docs の変更ではなく、actor が世界に対して何をするかの変更である。
+- did.json を manifest に合わせると、既に did.json を解決している相手の
+  identity が変わる。逆にすると effect の `:actor` が全部変わる。
+- CLAUDE.md の runtime を manifest に合わせるのは、**配備の事実**を調べずには
+  決められない（この repo には配備が無い）。
+
+いずれもオーナー判断であり、成熟度 loop の 1 反復が片手間に決めてよいことではない。
+一方、**不一致が文書化されていない**ことは今日ここで直せる欠陥だった —— README が
+存在せず、読み手が 4 面のどれを信じてよいか知る手段が無かった。
+
+## Consequences
+
+- 次にこの actor を配線する者は、README の表を出発点にできる。
+- 不一致が解消されたら、この ADR を `superseded` にして後継を指す。
+- **この ADR は『不一致は無害だ』とは言っていない。** (3) は実際に
+  『拒否されずに別物になる』形の欠陥である。優先度の判断材料として残す。
+
+## 再測定
+
+```bash
+# (3) collection 名の共通部分（0 なら未解消）
+# cell が実際に宣言している :collections を読む。cell key から名前を作り直さない
+# —— 作り直す版は source を無視するので、解消後も 0 を出し続ける（実測 2026-09-03）
+nbb --classpath src -e '
+(require (quote [intel.murakumo :as m])
+         (quote [clojure.set :as set])
+         (quote [\"fs\" :as fs]))
+(let [emitted  (set (mapcat :collections (vals m/cell-specs)))
+      manifest (js->clj (js/JSON.parse (fs/readFileSync \"actor-manifest.jsonld\" \"utf8\")))
+      declared (set (concat (get-in manifest [\"triggers\" \"subscribeRepos\" \"collections\"])
+                            (get manifest \"requiredCollections\")))]
+  (println \"emitted\" (count emitted)
+           \"declared\" (count declared)
+           \"intersection\" (count (set/intersection emitted declared))))'
+
+# (1) DID が 2 つあるか（distinct が 1 なら解消済み）
+node -e '
+const fs=require(\"fs\");
+const did=JSON.parse(fs.readFileSync(\".well-known/did.json\",\"utf8\")).id;
+const mid=JSON.parse(fs.readFileSync(\"actor-manifest.jsonld\",\"utf8\"))[\"@id\"];
+const src=fs.readFileSync(\"src/intel/murakumo.cljc\",\"utf8\")
+            .match(/\\(def actor-did\\s+\"([^\"]+)\"/)[1];
+console.log(did, mid, src, \"distinct\", new Set([did,mid,src]).size);'
+```
+"}]
