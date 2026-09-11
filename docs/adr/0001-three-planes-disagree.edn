@@ -99,7 +99,7 @@ collection 宛の `:mst/put-record` effect を返す**。effect は生成され�
 # (3) collection 名の共通部分（0 なら未解消）
 # cell が実際に宣言している :collections を読む。cell key から名前を作り直さない
 # —— 作り直す版は source を無視するので、解消後も 0 を出し続ける（実測 2026-09-03）
-nbb --classpath src -e '
+kbb --backend sci --classpath src -e '
 (require (quote [intel.murakumo :as m])
          (quote [clojure.set :as set])
          (quote [\"fs\" :as fs]))

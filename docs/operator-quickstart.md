@@ -42,7 +42,7 @@ This is the fastest way to see what the repo does. `nbb` loads the `.cljc`
 directly; no dependency resolution, no JVM.
 
 ```bash
-nbb --classpath src -e '
+kbb --backend sci --classpath src -e '
 (require (quote [intel.murakumo :as m]))
 (println "cells:" (count m/cell-specs))
 (let [blocked (m/cell-plan :analysis {})]
@@ -77,7 +77,7 @@ Note the collection on the last line — see §5.
 ## 3. Run the test suite (JVM)
 
 ```bash
-clojure -M:test
+kbb -M:test
 ```
 
 **Measured — exit 0, 33 s with dependencies already cached:**
@@ -102,7 +102,7 @@ override), `cell-plan` in both directions, the throw on an unknown cell, and
 ## 4. Lint
 
 ```bash
-clojure -M:lint
+kbb -M:lint
 ```
 
 **Measured — exit 0, 1147 ms:**
@@ -123,7 +123,7 @@ The README states that the collection names this repo emits and the ones its
 manifest declares **do not intersect**. Verify it rather than trusting it:
 
 ```bash
-nbb --classpath src -e '
+kbb --backend sci --classpath src -e '
 (require (quote [intel.murakumo :as m])
          (quote [clojure.set :as set])
          (quote ["fs" :as fs]))
