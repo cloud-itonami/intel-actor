@@ -24,7 +24,7 @@
 
 intel-actor は小さな repo（測定時点の 4d2851e で 10 ファイル、この ADR と README を加えて 13）だが、この actor が何であるかを述べる面が 4 つある:
 
-1. `src/intel/murakumo.cljc` — 実際に plan を作る境界
+1. `src/intel/murakumo.cljk` — 実際に plan を作る境界
 2. `actor-manifest.jsonld` — actor の宣言（capability / trigger / runtime）
 3. `.well-known/did.json` — DID document
 4. `CLAUDE.md` — 配備されたプラットフォームの散文
@@ -116,7 +116,7 @@ node -e '
 const fs=require(\"fs\");
 const did=JSON.parse(fs.readFileSync(\".well-known/did.json\",\"utf8\")).id;
 const mid=JSON.parse(fs.readFileSync(\"actor-manifest.jsonld\",\"utf8\"))[\"@id\"];
-const src=fs.readFileSync(\"src/intel/murakumo.cljc\",\"utf8\")
+const src=fs.readFileSync(\"src/intel/murakumo.cljk\",\"utf8\")
             .match(/\\(def actor-did\\s+\"([^\"]+)\"/)[1];
 console.log(did, mid, src, \"distinct\", new Set([did,mid,src]).size);'
 ```

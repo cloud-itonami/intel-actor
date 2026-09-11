@@ -108,7 +108,7 @@ clojure -M:lint
 **Measured — exit 0, 1147 ms:**
 
 ```
-src/intel/murakumo.cljc:159:14: warning: unused binding input
+src/intel/murakumo.cljk:159:14: warning: unused binding input
 linting took 1147ms, errors: 0, warnings: 1
 ```
 
@@ -159,7 +159,7 @@ node -e '
 const fs=require("fs");
 const did=JSON.parse(fs.readFileSync(".well-known/did.json","utf8")).id;
 const mid=JSON.parse(fs.readFileSync("actor-manifest.jsonld","utf8"))["@id"];
-const src=fs.readFileSync("src/intel/murakumo.cljc","utf8")
+const src=fs.readFileSync("src/intel/murakumo.cljk","utf8")
             .match(/\(def actor-did\s+"([^"]+)"/)[1];
 console.log("did.json  id      :", did);
 console.log("manifest  @id     :", mid);
