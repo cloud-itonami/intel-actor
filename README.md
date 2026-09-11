@@ -12,8 +12,8 @@ thirteen tracked files, one namespace, no network, no runtime, no host.
 
 | | |
 |---|---|
-| Source | `src/intel/murakumo.cljc` — one namespace, `intel.murakumo` |
-| Tests | `test/intel/murakumo_test.cljc` — 9 tests / 213 assertions |
+| Source | `src/intel/murakumo.cljk` — one namespace, `intel.murakumo` |
+| Tests | `test/intel/murakumo_test.cljk` — 9 tests / 213 assertions |
 | Declarations | `actor-manifest.jsonld`, `.well-known/did.json`, `storage-profile.edn` |
 | Prose | `CLAUDE.md` — describes the **deployed platform**, which does not live here |
 
