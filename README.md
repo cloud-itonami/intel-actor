@@ -15,7 +15,7 @@ thirteen tracked files, one namespace, no network, no runtime, no host.
 | Source | `src/intel/murakumo.cljk` — one namespace, `intel.murakumo` |
 | Tests | `test/intel/murakumo_test.cljk` — 9 tests / 213 assertions |
 | Declarations | `actor-manifest.jsonld`, `.well-known/did.json`, `storage-profile.edn` |
-| Prose | `CLAUDE.md` — describes the **deployed platform**, which does not live here |
+| Prose | `AGENTS.md` — describes the **deployed platform**, which does not live here |
 
 `intel.murakumo` is one data table and eight functions:
 
@@ -55,7 +55,7 @@ plane is canonical is an owner decision, not something a docs change may settle.
 See `docs/adr/0001-three-planes-disagree.edn` for the decision to record rather
 than reconcile, and for the commands that re-measure each row.
 
-| Question | `src/…/murakumo.cljc` | `actor-manifest.jsonld` | `.well-known/did.json` | `CLAUDE.md` |
+| Question | `src/…/murakumo.cljc` | `actor-manifest.jsonld` | `.well-known/did.json` | `AGENTS.md` |
 |---|---|---|---|---|
 | actor DID | `did:web:intel.etzhayyim.com` | same | **`did:web:etzhayyim.com:actor:intel`** | — |
 | runtime | (none) | `k8s-langserver` | — | **`Worker WASM`** |

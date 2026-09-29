@@ -27,7 +27,7 @@ intel-actor は小さな repo（測定時点の 4d2851e で 10 ファイル、�
 1. `src/intel/murakumo.cljk` — 実際に plan を作る境界
 2. `actor-manifest.jsonld` — actor の宣言（capability / trigger / runtime）
 3. `.well-known/did.json` — DID document
-4. `CLAUDE.md` — 配備されたプラットフォームの散文
+4. `AGENTS.md` — 配備されたプラットフォームの散文
 
 **この 4 面は互いに一致していない。** 2026-09-03 に実測した 3 点:
 
@@ -42,7 +42,7 @@ intel-actor は小さな repo（測定時点の 4d2851e で 10 ファイル、�
 ### (2) runtime の記述が食い違う
 
 manifest は `runtime: k8s-langserver` / `edge: sveltekit-proxy`。
-CLAUDE.md の表は `Runtime | Worker WASM (default)`。どちらもこの repo には
+AGENTS.md の表は `Runtime | Worker WASM (default)`。どちらもこの repo には
 存在しない（ここには runtime が 1 バイトも無い）ので、両方とも
 『他のどこかの配備』を指しているが、指し先が同じかどうかはここからは分からない。
 
@@ -69,7 +69,7 @@ collection 宛の `:mst/put-record` effect を返す**。effect は生成され�
 **記録する。reconcile しない。**
 
 - README にこの 3 点を測定値として書き、再測定コマンドを添える。
-- `collection` の実装も、did.json も、manifest も、CLAUDE.md も**変更しない**。
+- `collection` の実装も、did.json も、manifest も、AGENTS.md も**変更しない**。
 
 ## Rationale
 
@@ -79,7 +79,7 @@ collection 宛の `:mst/put-record` effect を返す**。effect は生成され�
   これは docs の変更ではなく、actor が世界に対して何をするかの変更である。
 - did.json を manifest に合わせると、既に did.json を解決している相手の
   identity が変わる。逆にすると effect の `:actor` が全部変わる。
-- CLAUDE.md の runtime を manifest に合わせるのは、**配備の事実**を調べずには
+- AGENTS.md の runtime を manifest に合わせるのは、**配備の事実**を調べずには
   決められない（この repo には配備が無い）。
 
 いずれもオーナー判断であり、成熟度 loop の 1 反復が片手間に決めてよいことではない。
