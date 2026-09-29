@@ -183,7 +183,7 @@ update `docs/adr/0001-three-planes-disagree.edn` and this section together.
 
 ## 6. What this quickstart deliberately does not cover
 
-`CLAUDE.md` documents a deployed Multi-INT platform: 16 XRPC methods, a Murakumo
+`AGENTS.md` documents a deployed Multi-INT platform: 16 XRPC methods, a Murakumo
 LLM pipeline, a graph schema, a 60-second heartbeat, reactive subscriptions.
 **None of that is in this repository** and none of it is reachable from here.
 This quickstart stops at the boundary because the boundary is all that is here.
